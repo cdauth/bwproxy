@@ -12,14 +12,12 @@ import java.io.OutputStream;
 public class ConnectionSender extends Thread
 {
 	private Connection m_connection;
-	private int m_number;
 
-	public ConnectionSender(Connection a_connection, ThreadGroup a_threadgroup, int a_number)
+	public ConnectionSender(Connection a_connection, ThreadGroup a_threadgroup)
 	{
-		super(a_threadgroup, "sender "+a_number);
+		super(a_threadgroup, "sender");
 
 		m_connection = a_connection;
-		m_number = a_number;
 	}
 
 	public void run()
@@ -41,14 +39,14 @@ public class ConnectionSender extends Thread
 				}
 				else
 				{
-					Logger.debug("Sent "+new String(buffer, 0, read));
+					//Logger.debug("Sent "+new String(buffer, 0, read));
 					output_stream.write(buffer, 0, read);
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			Logger.error("Sender "+m_number+" aborted.", e);
+			Logger.error("Sender aborted.", e);
 		}
 		m_connection.cancel();
 	}

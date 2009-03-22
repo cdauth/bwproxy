@@ -18,7 +18,7 @@ public class ConnectionReceiver extends Thread
 
 	public ConnectionReceiver(Connection a_connection, ThreadGroup a_threadgroup)
 	{
-		super(a_threadgroup, "receiver "+a_number);
+		super(a_threadgroup, "receiver");
 
 		m_connection = a_connection;
 	}
@@ -69,7 +69,7 @@ public class ConnectionReceiver extends Thread
 		}
 		catch(Exception e)
 		{
-			Logger.error("Receiver "+m_number+" aborted.", e);
+			Logger.error("Receiver aborted.", e);
 			m_connection.cancel();
 		}
 	}
