@@ -48,6 +48,7 @@ public class ConnectionSender extends Thread
 		{
 			Logger.error("Sender aborted.", e);
 		}
+		Logger.debug("Sender closed.");
 		m_connection.cancel();
 	}
 }

@@ -38,8 +38,6 @@ public class LowPriorityReceiver extends Thread
 		InputStream input_stream;
 		OutputStream output_stream;
 
-		Connection[] connections;
-
 		while(true)
 		{
 			synchronized(m_connections)
@@ -73,7 +71,7 @@ public class LowPriorityReceiver extends Thread
 						}
 						catch(Exception e)
 						{
-							Logger.error("One low priority connection aborted.", e);
+							Logger.error("One low priority connection aborted. Number is now "+m_connections.size(), e);
 							c.cancel();
 							m_connections.remove(c);
 						}
@@ -98,7 +96,7 @@ public class LowPriorityReceiver extends Thread
 		synchronized(m_connections)
 		{
 			m_connections.add(a_connection);
-			Logger.debug("Adding low priority connection.");
+			Logger.debug("Adding low priority connection. Number ist now "+m_connections.size());
 		}
 	}
 }
