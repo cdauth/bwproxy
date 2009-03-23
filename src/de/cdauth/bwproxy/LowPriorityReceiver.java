@@ -48,6 +48,7 @@ public class LowPriorityReceiver extends Thread
 				{
 					bwlimit_1 = (last_additional + bwlimit) / m_connections.size();
 					if(bwlimit_1 < 1) bwlimit_1 = 1;
+					if(bwlimit_1 > bwlimit) bwlimit_1 = bwlimit;
 					last_additional = bwlimit / m_connections.size();
 
 					for(Connection c : m_connections)
