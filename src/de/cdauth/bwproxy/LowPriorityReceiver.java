@@ -49,32 +49,39 @@ public class LowPriorityReceiver extends Thread
 					if(bwlimit_1 > bwlimit) bwlimit_1 = bwlimit;
 					last_additional = bwlimit / m_connections.size();
 
-					for(Connection c : m_connections)
+					try
 					{
-						try
+						for(Connection c : m_connections)
 						{
-							if(c.canceled())
-								throw new Exception("Connection.canceled() is true.");
-
-							input_stream = c.getProxySocket().getInputStream();
-							output_stream = c.getClientSocket().getOutputStream();
-							read = input_stream.read(buffer, 0, bwlimit_1);
-
-							if(read == -1)
-								throw new EOFException();
-
-							if(read > 0)
+							try
 							{
-								last_additional -= read;
-								output_stream.write(buffer, 0, read);
+								if(c.canceled())
+									throw new Exception("Connection.canceled() is true.");
+
+								input_stream = c.getProxySocket().getInputStream();
+								output_stream = c.getClientSocket().getOutputStream();
+								read = input_stream.read(buffer, 0, bwlimit_1);
+
+								if(read == -1)
+									throw new EOFException();
+
+								if(read > 0)
+								{
+									last_additional -= read;
+									output_stream.write(buffer, 0, read);
+								}
+							}
+							catch(Exception e)
+							{
+								Logger.error("One low priority connection aborted. Number is now "+m_connections.size(), e);
+								c.cancel();
+								m_connections.remove(c);
 							}
 						}
-						catch(Exception e)
-						{
-							Logger.error("One low priority connection aborted. Number is now "+m_connections.size(), e);
-							c.cancel();
-							m_connections.remove(c);
-						}
+					}
+					catch(Exception e)
+					{
+						Logger.error("This should not happen.", e);
 					}
 
 					if(last_additional < 0)
