@@ -38,6 +38,7 @@ public class ConnectionReceiver extends Thread
 
 			Logger.debug("max_traffic is "+max_traffic);
 			Logger.debug("buffer length is "+buffer.length);
+			Logger.debug("receiveBufferSize is "+m_connection.getProxySocket().getReceiveBufferSize());
 
 			while(true)
 			{
