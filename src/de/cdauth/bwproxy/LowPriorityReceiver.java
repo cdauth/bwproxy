@@ -40,7 +40,7 @@ public class LowPriorityReceiver extends Thread
 
 		while(true)
 		{
-			synchronized(m_connections)
+			synchronized(this)
 			{
 				if(m_connections.size() > 0)
 				{
@@ -91,12 +91,9 @@ public class LowPriorityReceiver extends Thread
 	 * Adds a connection to the thread.
 	*/
 
-	public void add(Connection a_connection)
+	public synchronized void add(Connection a_connection)
 	{
-		synchronized(m_connections)
-		{
-			m_connections.add(a_connection);
-			Logger.debug("Adding low priority connection. Number ist now "+m_connections.size());
-		}
+		m_connections.add(a_connection);
+		Logger.debug("Adding low priority connection. Number ist now "+m_connections.size());
 	}
 }
