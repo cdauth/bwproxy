@@ -31,6 +31,9 @@ public class Connection
 		m_client = a_client_socket;
 
 		m_proxy = new Socket();
+		int buffersize = Options.getBWLimit()/20;
+		if(buffersize < 1) buffersize = 1;
+		m_proxy.setReceiveBufferSize(buffersize);
 		m_proxy.connect(Options.getProxy());
 
 		Logger.debug("Connected to server "+m_proxy.getInetAddress()+" on port "+m_proxy.getPort()+".");
