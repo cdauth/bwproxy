@@ -47,12 +47,10 @@
 		<echo>
 bwproxy needs a digital certificate for code signing its JAR files.
 Since you don't appear to have one, we need to generate a new certificate.
-Once generated, it will be used to sign the JSPWiki.jar file. To create
+Once generated, it will be used to sign the bwproxy.jar file. To create
 the certificate, we need to ask you for your name and a few other things.
 
 The certificate file will be generated at: ${jks.keystore}.
-You should copy this file to your container's configuration directory,
-or wherever your jspwiki.policy file lives.
 
 If something in this process goes wrong, you can simply delete
 ${jks.keystore} and execute this target again... no harm done.
