@@ -15,7 +15,7 @@
 
 	<target name="compile" depends="init" description="Compile the source.">
 		<mkdir dir="${build}" />
-		<javac srcdir="${src}" destdir="${build}" debug="true" />
+		<javac srcdir="${src}" destdir="${build}" debug="true" classpath="lib/cmdargs/cmdargs.jar" />
 	</target>
 
 	<target name="dist" depends="compile,jks-create,jks-password" description="Compile the source and create a JAR file.">
