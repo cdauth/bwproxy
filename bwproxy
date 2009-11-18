@@ -1,2 +1,2 @@
-dir="$(dirname "$(which "$0")")"
+dir="$(readlink -m "$(dirname "$(which "$0")")")"
 java -classpath "$dir/lib/cmdargs/dist_src/cmdargs.jar:$dir/dist/lib/bwproxy.jar" de.cdauth.bwproxy.Main "$@"
