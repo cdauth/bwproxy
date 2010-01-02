@@ -1,5 +1,6 @@
 package de.cdauth.bwproxy;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.EOFException;
@@ -15,21 +16,24 @@ import java.io.EOFException;
 public class ConnectionReceiver extends Thread
 {
 	private Connection m_connection;
+	
+	private InputStream m_inputStream;
+	private OutputStream m_outputStream;
 
-	public ConnectionReceiver(Connection a_connection, ThreadGroup a_threadgroup)
+	public ConnectionReceiver(Connection a_connection, ThreadGroup a_threadgroup) throws IOException
 	{
 		super(a_threadgroup, "receiver");
 
 		m_connection = a_connection;
+		
+		m_inputStream = m_connection.getProxySocket().getInputStream();
+		m_outputStream = m_connection.getClientSocket().getOutputStream();
 	}
 
 	public void run()
 	{
 		try
 		{
-			InputStream input_stream = m_connection.getProxySocket().getInputStream();
-			OutputStream output_stream = m_connection.getClientSocket().getOutputStream();
-
 			int used_traffic = 0;
 			int max_traffic = Options.getMaxTraffic();
 			int read = 0;
@@ -42,29 +46,21 @@ public class ConnectionReceiver extends Thread
 
 			while(true)
 			{
-				read = input_stream.read(buffer);
+				read = m_inputStream.read(buffer);
 				if(read == -1)
 					throw new EOFException();
 
 				if(m_connection.canceled())
 					throw new Exception("Connection.canceled() is true.");
 
-				if(read > 0)
-				{
-					used_traffic += read;
-					//Logger.debug("Received "+new String(buffer, 0, read));
-					output_stream.write(buffer, 0, read);
-				}
+				used_traffic += read;
+				//Logger.debug("Received "+new String(buffer, 0, read));
+				m_outputStream.write(buffer, 0, read);
 
 				if(used_traffic > max_traffic)
 				{
 					Main.getLPReceiverThread().add(m_connection);
 					break;
-				}
-
-				if(read < 1)
-				{
-					try { sleep(10); } catch(Exception e) { }
 				}
 			}
 		}

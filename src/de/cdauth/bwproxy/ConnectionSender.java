@@ -1,5 +1,6 @@
 package de.cdauth.bwproxy;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -12,12 +13,17 @@ import java.io.OutputStream;
 public class ConnectionSender extends Thread
 {
 	private Connection m_connection;
+	private InputStream m_inputStream;
+	private OutputStream m_outputStream;
 
-	public ConnectionSender(Connection a_connection, ThreadGroup a_threadgroup)
+	public ConnectionSender(Connection a_connection, ThreadGroup a_threadgroup) throws IOException
 	{
 		super(a_threadgroup, "sender");
 
 		m_connection = a_connection;
+		
+		m_inputStream = m_connection.getClientSocket().getInputStream();
+		m_outputStream = m_connection.getProxySocket().getOutputStream();
 	}
 
 	public void run()
@@ -25,23 +31,15 @@ public class ConnectionSender extends Thread
 		try
 		{
 			byte[] buffer = new byte[1024];
-			InputStream input_stream = m_connection.getClientSocket().getInputStream();
-			OutputStream output_stream = m_connection.getProxySocket().getOutputStream();
 
 			int read = 0;
-			while((read = input_stream.read(buffer, 0, 1024)) > -1)
+			while((read = m_inputStream.read(buffer)) > -1)
 			{
 				if(m_connection.canceled())
 					break;
-				if(read < 1)
-				{
-					try { sleep(10); } catch(Exception e) { }
-				}
-				else
-				{
-					//Logger.debug("Sent "+new String(buffer, 0, read));
-					output_stream.write(buffer, 0, read);
-				}
+				
+				//Logger.debug("Sent "+new String(buffer, 0, read));
+				m_outputStream.write(buffer, 0, read);
 			}
 		}
 		catch(Exception e)

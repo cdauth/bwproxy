@@ -13,42 +13,35 @@ import java.net.Socket;
 
 public class Server extends Thread
 {
-	protected ServerSocket m_listen_socket;
-	protected ThreadGroup m_threadgroup;
+	private ServerSocket m_listenSocket;
+	private ThreadGroup m_clientGroup;
 
-	public Server()
+	public Server() throws IOException
 	{
 		super("server");
 		setPriority(5);
+		
+		Logger.debug("Starting server socket on port "+Options.getPort());
+		m_listenSocket = new ServerSocket(Options.getPort());
+		Logger.debug("Server is listening on port "+m_listenSocket.getLocalPort());
+
+		m_clientGroup = new ThreadGroup("clients");
+		m_clientGroup.setMaxPriority(3);
 	}
 
 	public void run()
 	{
-		try
-		{
-			Logger.debug("Starting server socket on port "+Options.getPort());
-			m_listen_socket = new ServerSocket(Options.getPort());
-			Logger.debug("Server is listening on port "+m_listen_socket.getLocalPort());
-
-			m_threadgroup = new ThreadGroup("clients");
-			m_threadgroup.setMaxPriority(3);
-
-			while(true) {
-				try
-				{
-					Logger.debug("Accepting new connection.");
-					Socket client_socket = m_listen_socket.accept();
-					Connection c = new Connection(client_socket, m_threadgroup);
-				}
-				catch(Exception e)
-				{
-					Logger.error("Accepting connection failed.", e);
-				}
+		while(true) {
+			try
+			{
+				Logger.debug("Accepting new connection.");
+				Socket client_socket = m_listenSocket.accept();
+				new Connection(client_socket, m_clientGroup);
 			}
-		}
-		catch(Exception e)
-		{
-			Logger.fatal("Server failed.", e);
+			catch(Exception e)
+			{
+				Logger.error("Accepting connection failed.", e);
+			}
 		}
 	}
 }

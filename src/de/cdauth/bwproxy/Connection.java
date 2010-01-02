@@ -1,5 +1,6 @@
 package de.cdauth.bwproxy;
 
+import java.io.IOException;
 import java.net.Socket;
 
 /**
@@ -17,16 +18,15 @@ public class Connection
 	protected ConnectionSender m_sender;
 	protected ConnectionReceiver m_receiver;
 
-	protected boolean m_canceled = false;
+	volatile protected boolean m_canceled = false;
 
 	/**
 	 * Initialises the new client thread.
 	 * @param a_client_socket The client socket returned by java.net.ServerSocket.accept().
 	 * @param a_threadgroup The thread group for all client connections.
-	 * @author Candid Dauth
 	*/
 
-	public Connection(Socket a_client_socket, ThreadGroup a_threadgroup) throws java.io.IOException
+	public Connection(Socket a_client_socket, ThreadGroup a_threadgroup) throws IOException
 	{
 		m_client = a_client_socket;
 
@@ -40,6 +40,13 @@ public class Connection
 		m_sender.start();
 		m_receiver.start();
 	}
+
+	@Override
+	public int hashCode()
+	{
+		return m_client.hashCode();
+	}
+
 
 	public Socket getClientSocket()
 	{

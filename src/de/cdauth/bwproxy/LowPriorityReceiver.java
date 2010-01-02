@@ -2,7 +2,12 @@ package de.cdauth.bwproxy;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.Vector;
 import java.io.EOFException;
 
 /**
@@ -17,7 +22,7 @@ public class LowPriorityReceiver extends Thread
 	/**
 	 * The added connections.
 	*/
-	LinkedList<Connection> m_connections = new LinkedList();
+	Set<Connection> m_connections = Collections.synchronizedSet(new HashSet<Connection>());
 
 	public LowPriorityReceiver()
 	{
@@ -40,7 +45,7 @@ public class LowPriorityReceiver extends Thread
 
 		while(true)
 		{
-			synchronized(this)
+			synchronized(m_connections)
 			{
 				if(m_connections.size() > 0)
 				{
@@ -48,40 +53,42 @@ public class LowPriorityReceiver extends Thread
 					if(bwlimit_1 < 1) bwlimit_1 = 1;
 					if(bwlimit_1 > bwlimit) bwlimit_1 = bwlimit;
 					last_additional = bwlimit / m_connections.size();
-
-					try
+ 
+					ArrayList<Connection> remove = null;
+					for(Connection c : m_connections)
 					{
-						for(Connection c : m_connections)
+						try
 						{
-							try
+							if(c.canceled())
+								throw new Exception("Connection.canceled() is true.");
+
+							input_stream = c.getProxySocket().getInputStream();
+							output_stream = c.getClientSocket().getOutputStream();
+							read = input_stream.read(buffer, 0, bwlimit_1);
+
+							if(read == -1)
+								throw new EOFException();
+
+							if(read > 0)
 							{
-								if(c.canceled())
-									throw new Exception("Connection.canceled() is true.");
-
-								input_stream = c.getProxySocket().getInputStream();
-								output_stream = c.getClientSocket().getOutputStream();
-								read = input_stream.read(buffer, 0, bwlimit_1);
-
-								if(read == -1)
-									throw new EOFException();
-
-								if(read > 0)
-								{
-									last_additional -= read;
-									output_stream.write(buffer, 0, read);
-								}
-							}
-							catch(Exception e)
-							{
-								Logger.error("One low priority connection aborted. Number is now "+m_connections.size(), e);
-								c.cancel();
-								m_connections.remove(c);
+								last_additional -= read;
+								output_stream.write(buffer, 0, read);
 							}
 						}
+						catch(Exception e)
+						{
+							Logger.error("One low priority connection aborted. Number is now "+m_connections.size(), e);
+							c.cancel();
+							if(remove == null)
+								remove = new ArrayList<Connection>();
+							remove.add(c);
+						}
 					}
-					catch(Exception e)
+					
+					if(remove != null)
 					{
-						Logger.error("This should not happen.", e);
+						for(Connection c : remove)
+							m_connections.remove(c);
 					}
 
 					if(last_additional < 0)
@@ -98,9 +105,12 @@ public class LowPriorityReceiver extends Thread
 	 * Adds a connection to the thread.
 	*/
 
-	public synchronized void add(Connection a_connection)
+	public void add(Connection a_connection)
 	{
-		m_connections.add(a_connection);
-		Logger.debug("Adding low priority connection. Number ist now "+m_connections.size());
+		synchronized(m_connections)
+		{
+			m_connections.add(a_connection);
+			Logger.debug("Adding low priority connection. Number ist now "+m_connections.size());
+		}
 	}
 }

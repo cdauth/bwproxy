@@ -14,7 +14,6 @@ public class Logger
 {
 	/**
 	 * A fatal error occured that causes the program to stop.
-	 * @author Candid Dauth
 	*/
 
 	public static void fatal(String a_message)
@@ -32,7 +31,6 @@ public class Logger
 
 	/**
 	 * An error occured that has to be printed in any case.
-	 * @author Candid Dauth
 	*/
 
 	public static void error(String a_message)
