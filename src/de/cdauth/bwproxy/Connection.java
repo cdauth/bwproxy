@@ -19,6 +19,9 @@ public class Connection
 	protected ConnectionReceiver m_receiver;
 
 	volatile protected boolean m_canceled = false;
+	
+	volatile private long sm_connectionNumber = 1;
+	private long m_connectionNumber;
 
 	/**
 	 * Initialises the new client thread.
@@ -28,12 +31,14 @@ public class Connection
 
 	public Connection(Socket a_client_socket, ThreadGroup a_threadgroup) throws IOException
 	{
+		m_connectionNumber = sm_connectionNumber++;
+
 		m_client = a_client_socket;
 
 		m_proxy = new Socket();
 		m_proxy.connect(Options.getProxy());
 
-		Logger.debug("Connected to server "+m_proxy.getInetAddress()+" on port "+m_proxy.getPort()+".");
+		Logger.debug(""+m_connectionNumber+": Connected to server "+m_proxy.getInetAddress()+" on port "+m_proxy.getPort()+".");
 
 		m_sender = new ConnectionSender(this, a_threadgroup);
 		m_receiver = new ConnectionReceiver(this, a_threadgroup);
@@ -56,6 +61,11 @@ public class Connection
 	public Socket getProxySocket()
 	{
 		return m_proxy;
+	}
+	
+	public long getConnectionNumber()
+	{
+		return m_connectionNumber;
 	}
 
 	/**
@@ -84,7 +94,7 @@ public class Connection
 		}
 		catch(Exception e)
 		{
-			Logger.debug("Closing client socket failed.", e);
+			Logger.debug(""+m_connectionNumber+": Closing client socket failed.", e);
 		}
 		try
 		{
@@ -92,7 +102,7 @@ public class Connection
 		}
 		catch(Exception e)
 		{
-			Logger.debug("Closing proxy socket failed.", e);
+			Logger.debug(""+m_connectionNumber+": Closing proxy socket failed.", e);
 		}
 		
 		// Prevent circular references

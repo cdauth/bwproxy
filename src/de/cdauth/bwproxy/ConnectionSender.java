@@ -44,9 +44,10 @@ public class ConnectionSender extends Thread
 		}
 		catch(Exception e)
 		{
-			Logger.error("Sender aborted.", e);
+			Logger.error(""+m_connection.getConnectionNumber()+": Sender aborted.", e);
+			m_connection.cancel();
 		}
-		Logger.debug("Sender closed.");
+		Logger.debug(""+m_connection.getConnectionNumber()+": Sender closed.");
 		// Do not cancel here! The receiver might still get data when the sender has reached its EOF.
 	}
 }

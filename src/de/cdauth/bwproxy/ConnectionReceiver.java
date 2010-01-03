@@ -40,9 +40,9 @@ public class ConnectionReceiver extends Thread
 
 			byte[] buffer = new byte[1024];
 
-			Logger.debug("max_traffic is "+max_traffic);
-			Logger.debug("buffer length is "+buffer.length);
-			Logger.debug("receiveBufferSize is "+m_connection.getProxySocket().getReceiveBufferSize());
+			//Logger.debug("max_traffic is "+max_traffic);
+			//Logger.debug("buffer length is "+buffer.length);
+			//Logger.debug("receiveBufferSize is "+m_connection.getProxySocket().getReceiveBufferSize());
 
 			while(true)
 			{
@@ -51,7 +51,7 @@ public class ConnectionReceiver extends Thread
 					throw new EOFException();
 
 				if(m_connection.canceled())
-					throw new Exception("Connection.canceled() is true.");
+					throw new Exception(""+m_connection.getConnectionNumber()+": Connection.canceled() is true.");
 
 				used_traffic += read;
 				//Logger.debug("Received "+new String(buffer, 0, read));
@@ -66,7 +66,7 @@ public class ConnectionReceiver extends Thread
 		}
 		catch(Exception e)
 		{
-			Logger.error("Receiver aborted.", e);
+			Logger.error(""+m_connection.getConnectionNumber()+": Receiver aborted.", e);
 			m_connection.cancel();
 		}
 	}

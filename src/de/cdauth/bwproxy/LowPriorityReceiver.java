@@ -58,7 +58,7 @@ public class LowPriorityReceiver extends Thread
 						try
 						{
 							if(c.canceled())
-								throw new Exception("Connection.canceled() is true.");
+								throw new Exception(""+c.getConnectionNumber()+": Connection.canceled() is true.");
 
 							input_stream = c.getProxySocket().getInputStream();
 							output_stream = c.getClientSocket().getOutputStream();
@@ -75,7 +75,7 @@ public class LowPriorityReceiver extends Thread
 						}
 						catch(Exception e)
 						{
-							Logger.error("One low priority connection aborted. Number is now "+m_connections.size(), e);
+							Logger.error(""+c.getConnectionNumber()+": One low priority connection aborted.", e);
 							c.cancel();
 							if(remove == null)
 								remove = new ArrayList<Connection>();
@@ -108,7 +108,7 @@ public class LowPriorityReceiver extends Thread
 		synchronized(m_connections)
 		{
 			m_connections.add(a_connection);
-			Logger.debug("Adding low priority connection. Number ist now "+m_connections.size());
+			Logger.debug(""+a_connection.getConnectionNumber()+": Adding low priority connection. Number ist now "+m_connections.size());
 		}
 	}
 }
