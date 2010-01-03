@@ -20,7 +20,7 @@ public class Connection
 
 	volatile protected boolean m_canceled = false;
 	
-	volatile private long sm_connectionNumber = 1;
+	volatile static private long sm_connectionNumber = 1;
 	private long m_connectionNumber;
 
 	/**
