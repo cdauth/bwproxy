@@ -1,0 +1,21 @@
+#!/sbin/runscript
+
+PIDFILE=/var/run/${SVCNAME}.pid
+BWPROXY=/usr/bin/bwproxy
+
+depend() {
+	provide bwproxy
+}
+
+start() {
+	ebegin "Starting bwproxy"
+	start-stop-daemon --start --quiet --pidfile "${PIDFILE}" --exec "$BWPROXY" -- \
+		-P "${PIDFILE}" ${BWPROXY_OPTS}
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping bwproxy"
+	start-stop-daemon --stop --quiet --pidfile "${PIDFILE}" --exec "$BWPROXY"
+	eend $?
+}
