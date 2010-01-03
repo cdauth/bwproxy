@@ -12,8 +12,8 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-DEPEND="dev-java/ant dev-java/libcmdargs sys-devel/gcc[gcj]"
-RDEPEND="dev-java/libcmdargs sys-devel/gcc[gcj]"
+DEPEND="dev-java/ant dev-java/cmdargs sys-devel/gcc[gcj]"
+RDEPEND="dev-java/cmdargs sys-devel/gcc[gcj]"
 
 src_prepare() {
 	ant distclean
