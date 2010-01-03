@@ -1,7 +1,8 @@
 #!/sbin/runscript
 
-PIDFILE=/var/run/${SVCNAME}.pid
-BWPROXY=/usr/bin/bwproxy
+PIDFILE="/var/run/${SVCNAME}.pid"
+BWPROXY="/usr/bin/bwproxy"
+LOGFILE="/var/log/${SVCNAME}"
 
 depend() {
 	provide bwproxy
@@ -9,7 +10,12 @@ depend() {
 
 start() {
 	ebegin "Starting bwproxy"
-	start-stop-daemon --start --quiet --background --stderr "/var/log/bwproxy" --make-pidfile --pidfile "${PIDFILE}" --user "nobody:nobody" --exec "$BWPROXY" -- ${BWPROXY_OPTS}
+	if [ ! -e "$LOGFILE" ]; then
+		touch "$LOGFILE"
+		chmod go-rw "$LOGFILE"
+		chown nobody:nobody "$LOGFILE"
+	fi
+	start-stop-daemon --start --quiet --background --stderr "$LOGFILE" --make-pidfile --pidfile "${PIDFILE}" --user "nobody:nobody" --exec "$BWPROXY" -- ${BWPROXY_OPTS}
 	eend $?
 }
 
