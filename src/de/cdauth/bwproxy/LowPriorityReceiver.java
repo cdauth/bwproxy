@@ -1,14 +1,12 @@
 package de.cdauth.bwproxy;
 
+import java.io.EOFException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.Vector;
-import java.io.EOFException;
 
 /**
  * The “low-priority” receiver is a thread that limits the bandwidth of all its connections. A connection can be added using the add() method.

@@ -47,6 +47,6 @@ public class ConnectionSender extends Thread
 			Logger.error("Sender aborted.", e);
 		}
 		Logger.debug("Sender closed.");
-		m_connection.cancel();
+		// Do not cancel here! The receiver might still get data when the sender has reached its EOF.
 	}
 }

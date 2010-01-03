@@ -64,6 +64,8 @@ public class Connection
 
 	public boolean canceled()
 	{
+		if(!m_canceled && !m_client.isConnected())
+			cancel();
 		return m_canceled;
 	}
 
@@ -92,5 +94,9 @@ public class Connection
 		{
 			Logger.debug("Closing proxy socket failed.", e);
 		}
+		
+		// Prevent circular references
+		m_sender = null;
+		m_receiver = null;
 	}
 }
